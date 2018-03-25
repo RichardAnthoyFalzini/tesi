@@ -17,7 +17,7 @@ Created on Jan 27, 2018
 import logging
 import sys
 from os.path import dirname
-sys.path.append("/work/rfalzini/pythonscript/demoTesi")
+ #sys.path.append("/work/rfalzini/pythonscript/demoTesi")
 import argparse
 from cropper import Cropper
 from MyKerasModel import MyKerasModel
@@ -41,8 +41,10 @@ if __name__ == '__main__':
                         help='optional string format')
     parser.add_argument('--nameFile',dest='name',help="name of the slide without extension ",required=True)
     parser.add_argument('--case',dest="case",help="case of slide")
-    parser.add_argument('--modelPath',dest="modelPath",help="keras model path",required=True)
+    parser.add_argument('--modelPath',dest="modelPath",help="keras model path",default="/data/model.hdf5")
     parser.add_argument('--red',dest="red",help="put red crop on special folder",type=bool,default=False)
+    parser.add_argument('--dontCrop',dest="dontCrop",help="default false if set to true will not make crop",type=bool,default=False)
+    parser.add_argument('--slideLevel',dest="slideLevel",help="default level 4 you can chose from 0 to 7 but lower you go bigger the final img",type=int,default=6)
 
         
     args = parser.parse_args()
@@ -52,10 +54,11 @@ if __name__ == '__main__':
     ############
     #crea i crop dalle annotazioni
     ############
-    slide=Cropper(name=args.name,case=args.case,redZone=args.red,minSizeX=500,minSizeY=500,outDirPath=args.outPath)
-    slide.readXML()
-    slide.makeCrop()
-      
+    if args.dontCrop is False :
+        slide=Cropper(name=args.name,case=args.case,redZone=args.red,minSizeX=500,minSizeY=500,outDirPath=args.outPath)
+        slide.readXML()
+        slide.makeCrop()
+          
     ############
     #calcola lable dei crop dal modello
     ############
@@ -63,7 +66,7 @@ if __name__ == '__main__':
     model=MyKerasModel(modelPath=args.modelPath,outPutPath=args.outPath)
     model.predict(dataDir=os.path.join(args.outPath,"crop"),case=0)
     
-    heatMap=HeatMap(csvPathName=os.path.join(args.outPath,"predictionBest.csv"),name=args.name,outPutPath=args.outPath)
+    heatMap=HeatMap(csvPathName=os.path.join(args.outPath,"predictionBest.csv"),name=args.name,outPutPath=args.outPath,slideLevel=args.slideLevel)
     heatMap.makeImg()
     
     print "End DEMO"
