@@ -50,7 +50,8 @@ def activationMap(args):
     out_rootdir = args.outPath
     
     if not os.path.exists(out_rootdir):
-        os.mkdir(out_rootdir)
+        os.makedirs(out_rootdir)
+
     
     base_model = keras.models.load_model(filepath=modelPath)
     layers = ['block5_pool']#, 'block4_pool', 'block3_pool', 'block2_pool', 'block1_pool']
