@@ -28,7 +28,7 @@ if __name__ == '__main__':
     ###
     #setting logger
     global logging
-    logging.basicConfig(stream= sys.stdout ,format='%(funcName)s %(asctime)s %(levelname)s:%(message)s',level=logging.DEBUG)
+    logging.basicConfig(stream= sys.stdout ,format='%(funcName)s %(asctime)s %(levelname)s:%(message)s',level=logging.INFO)
     
     ###
     #setting arguments parser

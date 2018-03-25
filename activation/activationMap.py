@@ -53,7 +53,7 @@ def activationMap(args):
         os.mkdir(out_rootdir)
     
     base_model = keras.models.load_model(filepath=modelPath)
-    layers = ['block5_pool', 'block4_pool', 'block3_pool', 'block2_pool', 'block1_pool']
+    layers = ['block5_pool']#, 'block4_pool', 'block3_pool', 'block2_pool', 'block1_pool']
     for l in layers:
         model = keras.models.Model(inputs=base_model.input, outputs=base_model.get_layer(l).output)
         logging.info("Processing layer "+ l)
@@ -69,7 +69,16 @@ def activationMap(args):
                 maps = list()
                 imgs = list()
                 for filename in enumerate(files):
-                    if filename[1].endswith(".jpeg") or filename[1].endswith(".png"):
+                    if filename[1].endswith(".jpeg"):
+
+                        #img=image.load_img(os.path.join(subdir, filename[1]),target_size=(224,224))
+                        #img_or = cv2.imread(os.path.join(subdir, filename[1]))
+                       # 
+                        #img = img_or.astype('float64')
+                        #img = image.img_to_array(img)
+                        #x = np.expand_dims(img, axis=0)
+                        #x = keras.applications.vgg16.preprocess_input(x)
+                        #features = model.predict(x)
                         
                         img_or = cv2.imread(os.path.join(subdir, filename[1]))
                         img_or = resize(img_or , 224,224,keep_aspect_ratio=False )
@@ -90,14 +99,14 @@ def activationMap(args):
     
                         heatmap = cv2.applyColorMap(np.uint8(255*activation_map), cv2.COLORMAP_JET)
                         fin = cv2.addWeighted(heatmap, 0.5, img_or, 0.7, 0)
-                        logging.info("salvandoImg in " + str(os.path.join(output_dir, "{}_act_{}_{}.png".format(l,filename[0],filename[1]))) )
-                        cv2.imwrite(os.path.join(output_dir, "act_{}_{}.png".format(filename[0],filename[1])), fin)
+                        logging.info("salvandoImg in " + str(os.path.join(output_dir, "act_prova.png")) )
+                        cv2.imwrite(os.path.join(output_dir, "act_prova.png"), fin)
                         maps.append(activation_map)
                         imgs.append(img_or)
     
-                #np.save(os.path.join(output_dir, 'act.npy'), np.asarray(maps))
-                #np.save(os.path.join(output_dir, 'imgs.npy'), np.asarray(imgs))
-                #logging.info("Saved" + str(os.path.join(output_dir, 'act.npy')))
+                np.save(os.path.join(output_dir, 'act.npy'), np.asarray(maps))
+                np.save(os.path.join(output_dir, 'imgs.npy'), np.asarray(imgs))
+                logging.info("Saved" + str(os.path.join(output_dir, 'act.npy')))
 
 
 
@@ -112,13 +121,13 @@ if __name__ == '__main__':
     ###
     #setting arguments parser
     parser = argparse.ArgumentParser(description='activation map printer')
-    parser.add_argument('--out', dest='outPath' ,default="/data/out", 
+    parser.add_argument('--out', dest='outPath' , 
                         help='outputh path for the crop',required=True)
-    parser.add_argument('--in', dest='inPath',default="/data/in", 
+    parser.add_argument('--in', dest='inPath', 
                         help='input path where crop are es test train validation')
     parser.add_argument('--format', dest='format' , default='.png' ,  
                         help='optional string format')
-    parser.add_argument('--modelPath',dest="modelPath",help="keras model path",default="/data/model.hdf5",required=True)
+    parser.add_argument('--modelPath',dest="modelPath",help="keras model path",required=True)
 
     args = parser.parse_args()
     
